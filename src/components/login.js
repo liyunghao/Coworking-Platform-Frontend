@@ -20,14 +20,21 @@ const useStyles = makeStyles((theme) => ({
     margin: 20,
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: "center",
+    alignItems: 'center',
+  },
+  form: {
+    margin: 20,
+    flexDirection: 'column',
+    justifyContent: "center",
     alignItems: 'center',
   }
 
 }));
-async function loginUser(payload) {
+async function request(payload, urls) {
   const headers = { "Content-Type": "application/json"}
   try {
-    const resp = await axios.post('/login', payload, { headers })
+    const resp = await axios.post(urls, payload, { headers })
                             .then()
                             .catch(err => {
                                console.log('Error', err);
@@ -42,15 +49,19 @@ async function loginUser(payload) {
 export default function Login() {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
+  const [nickname, setNickname] = useState();
+  const [email, setEmail] = useState();
+  const [register, setRegister] = useState(false);
+
   const classes = useStyles();
   let navigate = useNavigate();
 
-  const submitForm = async e => {
+  const submitLogin = async e => {
     e.preventDefault();
-    const resp = await loginUser ({ 
+    const resp = await request ({ 
       "username": username, 
       "password": password 
-    });
+    }, '/login');
     console.log(resp)
     if ('token' in resp.data) {
       // login success
@@ -61,19 +72,48 @@ export default function Login() {
         localStorage.setItem('token', resp.data.token)
         navigate("/");
       });
-      console.log("login success")
     } else {
       // login failed
       Swal.fire("Failed", resp.message, "error");
-      console.log("login failed")
     }
   }
+  
+  const submitRegister = async e => {
+    e.preventDefault();
+    const resp = await request({
+      "username": username,
+      "nickname": nickname,
+      "email": email,
+      "password": password,
+      "admin": false
+    }, '/users');
+    console.log(resp)
+    if (resp.status === 200) {
+      Swal.fire("Success", resp.message, "success", {
+        buttons: false,
+        timer: 2000,
+      }).then( (val) => {
+        toggleMode()
+      });
+    } else {
+      Swal.fire("Failed", resp.message, "error");
+    }
+  }
+
+  const toggleMode = () => {
+    setUserName('')
+    setPassword('')
+    setEmail('')
+    setNickname('')
+    setRegister(!register)
+  }
+
   return (
     <Grid container className={classes.root}>
       <CssBaseline />
-      <Grid item xs={12} md={5} component={Paper} elevation={6} square >
+      <Grid item xs={12} md={4} style={{display: register ? 'none' : 'flex'}} component={Paper} elevation={6} square >
         <div className={classes.paper}>
-          <form onSubmit={submitForm}>
+          <form className={classes.form} onSubmit={submitLogin}>
             <TextField 
               variant="outlined"
               margin="normal"
@@ -104,9 +144,73 @@ export default function Login() {
               Sign In
             </Button>
           </form>
+          <Button
+          color='primary'
+          onClick={toggleMode}
+          >
+            Register
+          </Button>
         </div>
       </Grid>
-
+      <Grid item xs={12} md={4} style={{display: register ? 'flex' : 'none'}} component={Paper} elevation={6} square >
+        <div className={classes.paper}>
+          <form className={classes.form} onSubmit={submitRegister}>
+            <TextField 
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              name="username"
+              label="Username"
+              onChange={e => setUserName(e.target.value)}
+            />
+            <TextField 
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              id="nickname"
+              name="nickname"
+              label="Nickname"
+              onChange={e => setNickname(e.target.value)}
+            />
+            <TextField 
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              id="email"
+              name="email"
+              label="Email"
+              onChange={e => setEmail(e.target.value)}
+            />
+            <TextField 
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="password"
+              name="password"
+              label="Password"
+              type="password"
+              onChange={e => setPassword(e.target.value)}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+            >
+              Register
+            </Button>
+          </form>
+          <Button
+          color='primary'
+          onClick={toggleMode}
+          >
+            Login
+          </Button>
+        </div>
+      </Grid>
     </Grid>
   )
 
