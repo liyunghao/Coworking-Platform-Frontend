@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Routes, BrowserRouter, Navigate, Outlet } from 'react-router-dom';
-//import Login from './components/login'
-import Login from './components/login'
-
+import Login from './pages/login'
+import Header from './components/Header'
 const Auth = () => {
   const user=localStorage.getItem('token')
   if (user) {
@@ -13,7 +12,7 @@ const Auth = () => {
 
 function AuthRoute () {
   const auth = Auth()
-  return auth ? <Outlet/> : <Navigate to="/login"/>
+  return auth ? <div> <Header/> <Outlet/> </div> : <Navigate to="/login"/>
 }
 function PublicRoute () {
   const auth = Auth()
@@ -27,14 +26,13 @@ class App extends Component {
 	  }
 	}
 	
-	
 	render() {
 		return (
       <div>
         <BrowserRouter>
           <Routes>
             /** Wrap all route here **/ 
-            <Route path="/" element = {<AuthRoute/>}>
+            <Route path="/*" element = {<AuthRoute/>}>
               
             </Route>
             
