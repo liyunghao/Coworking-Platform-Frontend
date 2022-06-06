@@ -1,11 +1,9 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Tooltip from '@mui/material/Tooltip';
 import Container from '@mui/material/Container';
